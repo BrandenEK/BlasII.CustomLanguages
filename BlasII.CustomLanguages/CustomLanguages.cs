@@ -65,8 +65,7 @@ public class CustomLanguages : BlasIIMod
         AddText(info, text);
 
         // Register font
-        if (font != null)
-            AddFont(info, font);
+        AddFont(info, font);
     }
 
     private void AddText(LanguageInfo info, Dictionary<string, string> text)
@@ -93,10 +92,11 @@ public class CustomLanguages : BlasIIMod
 
     private void AddFont(LanguageInfo info, TMP_FontAsset font)
     {
-        LocalizationManager_FindAsset_Patch.FontAssets.Add(info.Id, font);
+        if (font != null)
+            LocalizationManager_FindAsset_Patch.FontAssets.Add(info.Id, font);
 
         TermData data = LocalizationManager.GetTermData("FONT", out var source);
-        data.SetTranslation(source.GetLanguageIndexFromCode(info.Id), info.Id);
+        data.SetTranslation(source.GetLanguageIndexFromCode(info.Id), font == null ? "Blasphemy TMP" : info.Id);
 
         ModLog.Info($"Updating font for {info.Name} translation");
     }
