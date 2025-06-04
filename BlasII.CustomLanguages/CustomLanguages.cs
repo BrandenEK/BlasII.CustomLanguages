@@ -57,12 +57,18 @@ public class CustomLanguages : BlasIIMod
 
     private LanguageInfo LoadInfo(string path)
     {
+        if (!File.Exists(path))
+            throw new Exception($"No info.json file present!");
+
         string text = File.ReadAllText(path);
         return JsonConvert.DeserializeObject<LanguageInfo>(text);
     }
 
     private Dictionary<string, string> LoadText(string path)
     {
+        if (!File.Exists(path))
+            return [];
+
         string[] lines = File.ReadAllLines(path);
         Dictionary<string, string> language = [];
 
@@ -81,8 +87,11 @@ public class CustomLanguages : BlasIIMod
 
     private TMP_FontAsset LoadFont(string path)
     {
-        AssetBundle bundle = AssetBundle.LoadFromFile(path); // change to font.asset
-        UnityEngine.Object obj = bundle.LoadAsset("assets/NotoSerif-PL SDF.asset", Il2CppType.Of<TMP_FontAsset>());
+        if (!File.Exists(path))
+            return null;
+
+        AssetBundle bundle = AssetBundle.LoadFromFile(path);
+        UnityEngine.Object obj = bundle.LoadAsset("assets/font.asset", Il2CppType.Of<TMP_FontAsset>());
         TMP_FontAsset font = obj.Cast<TMP_FontAsset>();
         font.hideFlags = HideFlags.DontUnloadUnusedAsset;
 
