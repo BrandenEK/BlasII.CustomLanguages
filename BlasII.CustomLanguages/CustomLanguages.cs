@@ -1,8 +1,11 @@
 ﻿using BlasII.ModdingAPI;
+using Il2CppInterop.Runtime;
+using Il2CppTMPro;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using UnityEngine;
 
 namespace BlasII.CustomLanguages;
 
@@ -49,7 +52,7 @@ public class CustomLanguages : BlasIIMod
 
         // Load font
         string fontPath = Path.Combine(dir, "font.bundle");
-
+        TMP_FontAsset font = LoadFont(fontPath);
     }
 
     private LanguageInfo LoadInfo(string path)
@@ -74,5 +77,15 @@ public class CustomLanguages : BlasIIMod
         }
 
         return language;
+    }
+
+    private TMP_FontAsset LoadFont(string path)
+    {
+        AssetBundle bundle = AssetBundle.LoadFromFile(path); // change to font.asset
+        UnityEngine.Object obj = bundle.LoadAsset("assets/NotoSerif-PL SDF.asset", Il2CppType.Of<TMP_FontAsset>());
+        TMP_FontAsset font = obj.Cast<TMP_FontAsset>();
+        font.hideFlags = HideFlags.DontUnloadUnusedAsset;
+
+        return font;
     }
 }
