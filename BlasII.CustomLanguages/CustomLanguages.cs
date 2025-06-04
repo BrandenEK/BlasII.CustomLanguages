@@ -1,4 +1,5 @@
 ﻿using BlasII.ModdingAPI;
+using Il2CppI2.Loc;
 using Il2CppInterop.Runtime;
 using Il2CppTMPro;
 using Newtonsoft.Json;
@@ -53,6 +54,51 @@ public class CustomLanguages : BlasIIMod
         // Load font
         string fontPath = Path.Combine(dir, "font.bundle");
         TMP_FontAsset font = LoadFont(fontPath);
+
+        // Register in the I2.Loc LocalizationManager
+        AddLanguageToManager(info, text, font);
+    }
+
+    private void AddLanguageToManager(LanguageInfo info, Dictionary<string, string> text, TMP_FontAsset font)
+    {
+        // Register text
+        AddText(info, text);
+
+        // Register font
+        AddFont(info, font);
+    }
+
+    private void AddText(LanguageInfo info, Dictionary<string, string> text)
+    {
+        int count = 0;
+
+        foreach (var source in LocalizationManager.Sources)
+        {
+            source.AddLanguage(info.Name, info.Id);
+            int langIdx = source.GetLanguageIndexFromCode(info.Id);
+
+            foreach (string term in source.GetTermsList())
+            {
+                if (text.TryGetValue(term, out string newText))
+                {
+                    source.GetTermData(term).Languages[langIdx] = newText;
+                    count++;
+                }
+            }
+        }
+
+        ModLog.Info($"Updating {count} terms for {info.Name} translation");
+    }
+
+    private void AddFont(LanguageInfo info, TMP_FontAsset font)
+    {
+        if (font != null)
+            LocalizationManager_FindAsset_Patch.FontAssets.Add(info.Id, font);
+
+        TermData data = LocalizationManager.GetTermData("FONT", out var source);
+        data.SetTranslation(source.GetLanguageIndexFromCode(info.Id), font == null ? "Blasphemy TMP" : info.Id);
+
+        ModLog.Info($"Updating font for {info.Name} translation");
     }
 
     private LanguageInfo LoadInfo(string path)
