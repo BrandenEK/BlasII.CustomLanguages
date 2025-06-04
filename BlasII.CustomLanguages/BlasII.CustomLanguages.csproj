@@ -22,6 +22,7 @@
   <ItemGroup>
     <PackageReference Include="BlasII.GameLibs" Version="2.2.0" />
     <PackageReference Include="BlasII.ModdingAPI" Version="2.0.0" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
   </ItemGroup>
 
   <Target Name="Development" AfterTargets="PostBuildEvent">

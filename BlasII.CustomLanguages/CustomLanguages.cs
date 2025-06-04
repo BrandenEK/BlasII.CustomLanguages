@@ -1,4 +1,6 @@
 ﻿using BlasII.ModdingAPI;
+using Newtonsoft.Json;
+using System;
 using System.IO;
 
 namespace BlasII.CustomLanguages;
@@ -21,14 +23,27 @@ public class CustomLanguages : BlasIIMod
         ModLog.Info($"Loading custom languages from {langDir}");
         foreach (string dir in Directory.GetDirectories(langDir))
         {
-            LoadLanguage(dir);
+            try
+            {
+                LoadLanguage(dir);
+            }
+            catch (Exception ex)
+            {
+                ModLog.Error(ex);
+            }
         }
     }
 
     private void LoadLanguage(string dir)
     {
-        string langCode = Path.GetFileName(dir);
-        ModLog.Info($"Loading language: {langCode}");
+        ModLog.Info($"Loading language: {Path.GetFileName(dir)}");
 
+        LanguageInfo info = LoadInfo(Path.Combine(dir, "info.json"));
+    }
+
+    private LanguageInfo LoadInfo(string path)
+    {
+        string text = File.ReadAllText(path);
+        return JsonConvert.DeserializeObject<LanguageInfo>(text);
     }
 }
