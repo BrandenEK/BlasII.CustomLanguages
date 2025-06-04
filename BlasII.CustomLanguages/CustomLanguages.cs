@@ -1,4 +1,5 @@
 ﻿using BlasII.ModdingAPI;
+using Il2CppI2.Loc;
 using Il2CppInterop.Runtime;
 using Il2CppTMPro;
 using Newtonsoft.Json;
@@ -53,6 +54,37 @@ public class CustomLanguages : BlasIIMod
         // Load font
         string fontPath = Path.Combine(dir, "font.bundle");
         TMP_FontAsset font = LoadFont(fontPath);
+
+        // Register in the I2.Loc LocalizationManager
+        AddLanguageToManager(info, text, font);
+    }
+
+    private void AddLanguageToManager(LanguageInfo info, Dictionary<string, string> text, TMP_FontAsset font)
+    {
+        int count = 0;
+
+        foreach (var source in LocalizationManager.Sources)
+        {
+            source.AddLanguage(info.Name, info.Id);
+            int langIdx = source.GetLanguages().Count - 1;
+
+            foreach (string term in source.GetTermsList())
+            {
+                if (text.TryGetValue(term, out string newText))
+                {
+                    source.GetTermData(term).Languages[langIdx] = newText;
+                    count++;
+                }
+
+                //if (term == "FONT")
+                //{
+                //    source.GetTermData(term).SetTranslation(langIdx, $"{info.Id}_font");
+                //    ModLog.Error("Changing font " + source.Google_SpreadsheetName);
+                //}
+            }
+        }
+
+        ModLog.Info($"Updating {count} terms for {info.Name} translation");
     }
 
     private LanguageInfo LoadInfo(string path)
