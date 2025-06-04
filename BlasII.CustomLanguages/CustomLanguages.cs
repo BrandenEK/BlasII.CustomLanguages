@@ -61,12 +61,22 @@ public class CustomLanguages : BlasIIMod
 
     private void AddLanguageToManager(LanguageInfo info, Dictionary<string, string> text, TMP_FontAsset font)
     {
+        // Register text
+        AddText(info, text);
+
+        // Register font
+        if (font != null)
+            AddFont(info, font);
+    }
+
+    private void AddText(LanguageInfo info, Dictionary<string, string> text)
+    {
         int count = 0;
 
         foreach (var source in LocalizationManager.Sources)
         {
             source.AddLanguage(info.Name, info.Id);
-            int langIdx = source.GetLanguages().Count - 1;
+            int langIdx = source.GetLanguageIndexFromCode(info.Id);
 
             foreach (string term in source.GetTermsList())
             {
@@ -75,16 +85,20 @@ public class CustomLanguages : BlasIIMod
                     source.GetTermData(term).Languages[langIdx] = newText;
                     count++;
                 }
-
-                //if (term == "FONT")
-                //{
-                //    source.GetTermData(term).SetTranslation(langIdx, $"{info.Id}_font");
-                //    ModLog.Error("Changing font " + source.Google_SpreadsheetName);
-                //}
             }
         }
 
         ModLog.Info($"Updating {count} terms for {info.Name} translation");
+    }
+
+    private void AddFont(LanguageInfo info, TMP_FontAsset font)
+    {
+        LocalizationManager_FindAsset_Patch.FontAssets.Add(info.Id, font);
+
+        TermData data = LocalizationManager.GetTermData("FONT", out var source);
+        data.SetTranslation(source.GetLanguageIndexFromCode(info.Id), info.Id);
+
+        ModLog.Info($"Updating font for {info.Name} translation");
     }
 
     private LanguageInfo LoadInfo(string path)
