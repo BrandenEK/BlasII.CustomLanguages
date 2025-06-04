@@ -95,8 +95,12 @@ public class CustomLanguages : BlasIIMod
         if (font != null)
             LocalizationManager_FindAsset_Patch.FontAssets.Add(info.Id, font);
 
-        TermData data = LocalizationManager.GetTermData("FONT", out var source);
-        data.SetTranslation(source.GetLanguageIndexFromCode(info.Id), font == null ? "Blasphemy TMP" : info.Id);
+        TermData fontTerm = LocalizationManager.GetTermData("FONT", out var source);
+        TermData logoTerm = source.GetTermData("UI_LANDING/LOGO");
+        int langIdx = source.GetLanguageIndexFromCode(info.Id);
+
+        fontTerm.SetTranslation(langIdx, font == null ? "Blasphemy TMP" : info.Id);
+        logoTerm.SetTranslation(langIdx, "BlasphemousII-logo-pixel");
 
         ModLog.Info($"Updating font for {info.Name} translation");
     }
