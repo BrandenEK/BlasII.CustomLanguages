@@ -128,14 +128,23 @@ public class CustomLanguages : BlasIIMod
         string[] lines = File.ReadAllLines(path);
         Dictionary<string, string> language = [];
 
-        foreach (string line in lines)
+        for (int i = 0; i < lines.Length; i++)
         {
-            int colonIdx = line.IndexOf(':');
-            string key = line.Substring(0, colonIdx).Trim();
-            string value = line.Substring(colonIdx + 1).Trim().Replace('@', '\n');
+            string line = lines[i];
 
-            if (value != string.Empty)
-                language.Add(key, value);
+            try
+            {
+                int colonIdx = line.IndexOf(':');
+                string key = line.Substring(0, colonIdx).Trim();
+                string value = line.Substring(colonIdx + 1).Trim().Replace('@', '\n');
+
+                if (value != string.Empty)
+                    language.Add(key, value);
+            }
+            catch (Exception ex)
+            {
+                ModLog.Error($"{ex.GetType().Name} on line {i + 1}: {ex.Message}");
+            }
         }
 
         return language;
